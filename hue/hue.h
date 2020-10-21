@@ -1,44 +1,49 @@
 /*
- *  Project: Hue IoT Library
+ *  Project: 	 Hue IoT Library
  *  Description: Library for controlling Hue Lights at IOT Classroom
- *  Authors:  Brian Rashap
- *  Date:     1-MAY-2020
+ *  Authors:  	 Brian Rashap
+ *  Date:     	 1-MAY-2020
  */
 
+/* Usage:
+ * setHue(int lightNum, bool HueOn, int HueColor, int HueBright);
+ * where:
+ *    lightNum is the number of the light to be controlled
+ *    HueOn is true to turn the light on, false to turn it off
+ *    HueColor is a number between 0 and 65353 (see constants below)
+ *    HueBright is the brightness between 0 and 255
+ *
+ * NOTE: In your main code, Ethernet.begin(mac) needs to be called
+ */
 
 // Hue Configuration
-const char hueHubIP[] = "192.168.1.9";       // Hue hub IP
+const char hueHubIP[] = "192.168.1.2";       // Hue hub IP
 const char hueUsername[] = "MQlZziRO0Wai5MsMHll8xAUAQqw85Qrr8tM37F3T";
 const int hueHubPort = 80;   // HTTP: 80, HTTPS: 443, HTTP-PROXY: 8080
 
 //  Hue variables
-boolean hueOn;  // on/off
-int hueBri;  // brightness value
-long hueHue;  // hue value
+int hueHue;
+int hueBri;
+bool hueOn;
 String hueCmd;  // Hue command
 
 // Hue colors
-int HueRed = 0;
-int HueOrange = 5000;
-int HueYellow = 10000;
-int HueGreen = 22500;
-int HueBlue = 45000;
-int HueIndigo = 47500;
-int HueViolet = 50000;
-int HueRainbow[] = {HueRed, HueOrange, HueYellow, HueGreen, HueBlue, HueIndigo, HueViolet};
+const int HueRed = 0;
+const int HueOrange = 5000;
+const int HueYellow = 10000;
+const int HueGreen = 22500;
+const int HueBlue = 45000;
+const int HueIndigo = 47500;
+const int HueViolet = 50000;
+const int HueRainbow[] = {HueRed, HueOrange, HueYellow, HueGreen, HueBlue, HueIndigo, HueViolet};
 
 EthernetClient HueClient;
 
-boolean setHue(int lightNum, bool HueOn, int HueColor, int HueBright) {
+bool setHue(int lightNum, bool HueOn, int HueColor, int HueBright) {
 
   String command = "";  
 
   if(HueOn == true) {
-    /*
-    command = "{\"on\":true,\"sat\":255,\"bri\":255,\"hue\":";
-    command = command + String(HueColor) + "}";
-    */
-    
     command = "{\"on\":true,\"sat\":255,\"bri\":";
     command = command + String(HueBright) + ",\"hue\":";
     command = command + String(HueColor) + "}";
@@ -49,15 +54,12 @@ boolean setHue(int lightNum, bool HueOn, int HueColor, int HueBright) {
 
   if (HueClient.connect(hueHubIP, hueHubPort))
   {
-    //while (HueClient.connected())
-    //{
       Serial.println("Sending Command to Hue");
       Serial.println(command);
       HueClient.print("PUT /api/");
       HueClient.print(hueUsername);
       HueClient.print("/lights/");
       HueClient.print(lightNum);  // hueLight zero based, add 1
-      //  HueClient.println("/state");
       HueClient.println("/state HTTP/1.1");
       HueClient.println("keep-alive");
       HueClient.print("Host: ");
@@ -77,7 +79,7 @@ boolean setHue(int lightNum, bool HueOn, int HueColor, int HueBright) {
 }
 
 
-boolean getHue(int lightNum)
+bool getHue(int lightNum)
 {
   if (HueClient.connect(hueHubIP, hueHubPort))
   {
